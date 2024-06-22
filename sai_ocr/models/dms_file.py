@@ -2,6 +2,7 @@ import requests
 
 from odoo import api, fields, models, _
 
+import time
 
 class File(models.Model):
     _inherit = "dms.file"
@@ -30,7 +31,7 @@ class File(models.Model):
         xuser = self.env.user.company_id
 
         workspace_id = xuser.sai_workspace_id
-        project_id = xuser.sai_invoice_project_id
+        project_id = False
 
         # api_url = xuser.sai_api_url
         api_url = "https://go.v7labs.com/api"
@@ -42,26 +43,36 @@ class File(models.Model):
 
         for rec in self:
             if not rec.send_response_json:
-                xfile_url = rec.get_base_url() + rec._get_share_url(redirect=True)
 
-                if xfile_url:
+                if rec.directory_id.ocr_model_type == "journal":
+                    project_id = xuser.sai_journal_project_id
+                if rec.directory_id.ocr_model_type == "bill":
+                    project_id = xuser.sai_bill_project_id
+                if rec.directory_id.ocr_model_type == "invoice":
+                    project_id = xuser.sai_invoice_project_id
 
-                    payload = {
-                        "fields": {
-                            "invoice": {
-                                "file_name": rec.name,
-                                "file_url": xfile_url,
+                if project_id:
+                    xfile_url = rec.get_base_url() + rec._get_share_url(redirect=True)
+
+                    if xfile_url:
+
+                        payload = {
+                            "fields": {
+                                "invoice": {
+                                    "file_name": rec.name,
+                                    "file_url": xfile_url,
+                                }
                             }
                         }
-                    }
-                    response = requests.post(url, json=payload, headers=headers, timeout=30)
+                        response = requests.post(url, json=payload, headers=headers, timeout=30)
 
-                    try:
-                        rec.entitiy_id = response.json()["id"]
-                        rec.send_response_json = response.json()
-                    except Exception:
-                        pass
+                        try:
+                            rec.entitiy_id = response.json()["id"]
+                            rec.send_response_json = response.json()
+                        except Exception:
+                            pass
 
+                time.sleep(0.5)
 
     def action_receive_ocr(self):
         xuser = self.env.user.company_id
