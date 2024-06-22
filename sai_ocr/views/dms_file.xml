@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="search_dms_file" model="ir.ui.view">
+        <field name="name">dms_file.search.inherit.ocr</field>
+        <field name="model">dms.file</field>
+        <field name="inherit_id" ref="dms.view_dms_file_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='page_access']" position="after">
+                <page name="page_ocr" string="OCR Information">
+                    <group>
+                        <field name="entitiy_id" readonly="1" force_save="1" />
+                        <field name="send_response_json" readonly="1" force_save="1" />
+                        <field
+                            name="receive_response_json"
+                            readonly="1"
+                            force_save="1"
+                        />
+                    </group>
+                </page>
+            </xpath>
+            <xpath expr="//header//button[@name='lock']" position="before">
+                <field name="send_ocr" invisible="1" />
+                <field name="receive_ocr" invisible="1" />
+                <button
+                    class="oe_highlight"
+                    name="action_send_ocr"
+                    type="object"
+                    string="Send OCR"
+                    attrs="{'invisible':[('send_ocr', '=', False)]}"
+                />
+                <button
+                    class="oe_highlight"
+                    name="action_receive_ocr"
+                    type="object"
+                    string="Receive OCR"
+                    attrs="{'invisible':[('receive_ocr', '=', False)]}"
+                />
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_dms_file_tree" model="ir.ui.view">
+        <field name="name">dms_file.tree.ocr</field>
+        <field name="model">dms.file</field>
+        <field name="inherit_id" ref="dms.view_dms_file_tree" />
+        <field name="arch" type="xml">
+            <xpath expr="//tree//field[1]" position="before">
+                <header>
+                    <button
+                        class="oe_highlight"
+                        name="action_send_ocr"
+                        type="object"
+                        string="Send OCR"
+                    />
+                    <button
+                        class="oe_highlight"
+                        name="action_receive_ocr"
+                        type="object"
+                        string="Receive OCR"
+                    />
+                    <button
+                        class="oe_highlight"
+                        name="action_create_journal"
+                        type="object"
+                        string="Journal OCR"
+                    />
+                    <button
+                        class="oe_highlight"
+                        name="action_create_bill"
+                        type="object"
+                        string="Bill OCR"
+                    />
+                    <button
+                        class="oe_highlight"
+                        name="action_create_invoice"
+                        type="object"
+                        string="Invoice OCR"
+                    />
+                </header>
+            </xpath>
+        </field>
+    </record>
+
+    view_dms_file_tree
+</odoo>
