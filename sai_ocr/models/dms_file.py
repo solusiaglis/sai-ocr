@@ -37,7 +37,7 @@ class File(models.Model):
         api_url = "https://go.v7labs.com/api"
         api_key = xuser.sai_api_key
 
-        url = f"{api_url}/workspaces/{workspace_id}/projects/{project_id}/entities"
+        # url = f"{api_url}/workspaces/{workspace_id}/projects/{project_id}/entities"
 
         headers = {"X-API-KEY": api_key}
 
@@ -64,6 +64,9 @@ class File(models.Model):
                                 }
                             }
                         }
+
+                        url = f"{api_url}/workspaces/{workspace_id}/projects/{project_id}/entities"
+
                         response = requests.post(url, json=payload, headers=headers, timeout=30)
 
                         try:
