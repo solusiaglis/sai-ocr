@@ -75,7 +75,7 @@ class File(models.Model):
                         except Exception:
                             pass
 
-                time.sleep(0.5)
+                time.sleep(1)
 
     def action_receive_ocr(self):
         xuser = self.env.user.company_id
