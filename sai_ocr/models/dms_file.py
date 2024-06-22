@@ -106,7 +106,7 @@ class File(models.Model):
                 response = requests.put(url, json=payload, headers=headers, timeout=30)
 
                 try:
-                    if response.json()["status"] != "idle":
+                    if response.json()["status"] == "complete":
                         rec.receive_response_json = response.json()
                 except Exception:
                     pass
