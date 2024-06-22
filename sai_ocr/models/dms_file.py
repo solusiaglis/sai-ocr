@@ -107,7 +107,7 @@ class File(models.Model):
 
                 try:
                     if response.json()["status"] != "idle":
-                        rec.receive_response_json = response.json()["status"]
+                        rec.receive_response_json = response.json()
                 except Exception:
                     pass
 
