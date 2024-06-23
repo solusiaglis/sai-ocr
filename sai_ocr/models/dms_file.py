@@ -68,7 +68,7 @@ class File(models.Model):
 
                         url = f"{api_url}/workspaces/{workspace_id}/projects/{project_id}/entities"
 
-                        response = requests.post(url, json=payload, headers=headers, timeout=30)
+                        #response = requests.post(url, json=payload, headers=headers, timeout=30)
 
                         # try:
                         #     rec.entitiy_id = response.json()["id"]
