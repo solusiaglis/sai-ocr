@@ -41,6 +41,20 @@ class File(models.Model):
 
         headers = {"X-API-KEY": api_key}
 
+        # for rec in self:
+        #     if not rec.send_response_json:
+
+        #         if rec.directory_id.ocr_model_type == "journal":
+        #             project_id = xuser.sai_journal_project_id
+        #         if rec.directory_id.ocr_model_type == "bill":
+        #             project_id = xuser.sai_bill_project_id
+        #         if rec.directory_id.ocr_model_type == "invoice":
+        #             project_id = xuser.sai_invoice_project_id
+
+        #         if project_id:
+        #             xfile_url = rec.get_base_url() + rec._get_share_url(redirect=True)
+        #             print(xfile_url)
+
         for rec in self:
             if not rec.send_response_json:
 
@@ -52,21 +66,8 @@ class File(models.Model):
                     project_id = xuser.sai_invoice_project_id
 
                 if project_id:
-                    xfile_url = rec.get_base_url() + rec._get_share_url(redirect=True)
-                    print(xfile_url)
-
-        for rec in self:
-            if not rec.send_response_json:
-
-                if rec.directory_id.ocr_model_type == "journal":
-                    project_id = xuser.sai_journal_project_id
-                if rec.directory_id.ocr_model_type == "bill":
-                    project_id = xuser.sai_bill_project_id
-                if rec.directory_id.ocr_model_type == "invoice":
-                    project_id = xuser.sai_invoice_project_id
-
-                if project_id:
-                    xfile_url = rec.get_base_url() + rec._get_share_url(redirect=True)
+                    #xfile_url = rec.get_base_url() + rec._get_share_url(redirect=True)
+                    xfile_url = "https://slicedinvoices.com/pdf/wordpress-pdf-invoice-plugin-sample.pdf"
 
                     if xfile_url:
 
