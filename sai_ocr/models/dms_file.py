@@ -52,7 +52,8 @@ class File(models.Model):
                     project_id = xuser.sai_invoice_project_id
 
                 if project_id:
-                    xfile_url = rec.get_base_url() + rec._get_share_url(redirect=True)
+                    xfile_url = rec.get_base_url() + rec._get_share_url(redirect=False)
+                    time.sleep(1)
 
                     if xfile_url:
 
@@ -69,13 +70,21 @@ class File(models.Model):
 
                         response = requests.post(url, json=payload, headers=headers, timeout=30)
 
+                        # try:
+                        #     rec.entitiy_id = response.json()["id"]
+                        #     rec.send_response_json = response.json()
+                        # except Exception:
+                        #     pass
+
                         try:
+                            response = requests.post(url, json=payload, headers=headers, timeout=30)
+                            response.raise_for_status()  # Raises an exception for HTTP errors
                             rec.entitiy_id = response.json()["id"]
                             rec.send_response_json = response.json()
-                        except Exception:
-                            pass
-
-                time.sleep(1)
+                            print(response.json())  # Or handle the response data as needed
+                        except requests.exceptions.RequestException as e:
+                            print(f"An error occurred: {e}")
+                            
 
     def action_receive_ocr(self):
         xuser = self.env.user.company_id
@@ -103,13 +112,14 @@ class File(models.Model):
                     "X-API-KEY": api_key
                 }
 
-                response = requests.put(url, json=payload, headers=headers, timeout=30)
-
                 try:
+                    response = requests.put(url, json=payload, headers=headers, timeout=30)
+                    response.raise_for_status()  # Raises an exception for HTTP errors
                     if response.json()["status"] == "complete":
                         rec.receive_response_json = response.json()
-                except Exception:
-                    pass
+                        print(response.json())  # Or handle the response data as needed
+                except requests.exceptions.RequestException as e:
+                    print(f"An error occurred: {e}")
 
     def action_create_journal(self):
         return
