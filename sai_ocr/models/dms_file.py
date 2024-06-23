@@ -90,6 +90,8 @@ class File(models.Model):
                                 response = requests.post(url, json=payload, headers=headers, timeout=30)
                                 if response.status_code == 200:
                                     print("Success:", response.json())
+                                    rec.entitiy_id = response.json()["id"]
+                                    rec.send_response_json = response.json()
                                     break
                                 else:
                                     print(f"Received status code {response.status_code}. Retrying...")
