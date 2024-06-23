@@ -87,7 +87,8 @@ class File(models.Model):
                                                     
                         while True:
                             try:
-                                response = requests.post(url, json=payload, headers=headers, timeout=30)
+                                response = requests.post(url, json=payload, headers=headers, timeout=120)
+                                time.sleep(5)  # Wait for 5 seconds before retrying
                                 if response.status_code == 200:
                                     print("Success:", response.json())
                                     rec.entitiy_id = response.json()["id"]
@@ -126,7 +127,7 @@ class File(models.Model):
                 }
 
                 try:
-                    response = requests.put(url, json=payload, headers=headers, timeout=30)
+                    response = requests.put(url, json=payload, headers=headers, timeout=120)
                     response.raise_for_status()  # Raises an exception for HTTP errors
                     if response.json()["status"] == "complete":
                         rec.receive_response_json = response.json()
