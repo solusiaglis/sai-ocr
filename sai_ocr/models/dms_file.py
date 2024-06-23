@@ -53,7 +53,7 @@ class File(models.Model):
 
                 if project_id:
                     xfile_url = rec.get_base_url() + rec._get_share_url(redirect=True)
-                    # time.sleep(1)
+                    time.sleep(5)
 
                     if xfile_url:
 
@@ -85,21 +85,35 @@ class File(models.Model):
                         # except requests.exceptions.RequestException as e:
                         #     print(f"An error occurred: {e}")
                                                     
-                        while True:
-                            try:
-                                response = requests.post(url, json=payload, headers=headers, timeout=120)
-                                time.sleep(5)  # Wait for 5 seconds before retrying
-                                if response.status_code == 200:
-                                    print("Success:", response.json())
-                                    rec.entitiy_id = response.json()["id"]
-                                    rec.send_response_json = response.json()
-                                    break
-                                else:
-                                    print(f"Received status code {response.status_code}. Retrying...")
-                            except requests.exceptions.RequestException as e:
-                                print(f"Request failed: {e}. Retrying...")
-                            time.sleep(5)  # Wait for 5 seconds before retrying
-                            
+                        # while True:
+                        #     try:
+                        #         response = requests.post(url, json=payload, headers=headers, timeout=120)
+                        #         #time.sleep(5)  # Wait for 5 seconds before retrying
+                        #         if response.status_code == 200:
+                        #             print("Success:", response.json())
+                        #             rec.entitiy_id = response.json()["id"]
+                        #             rec.send_response_json = response.json()
+                        #             break
+                        #         else:
+                        #             print(f"Received status code {response.status_code}. Retrying...")
+                        #     except requests.exceptions.RequestException as e:
+                        #         print(f"Request failed: {e}. Retrying...")
+                        #     time.sleep(5)  # Wait for 5 seconds before retrying
+
+                        try:
+                            response = requests.post(url, json=payload, headers=headers, timeout=120)
+                            #time.sleep(5)  # Wait for 5 seconds before retrying
+                            if response.status_code == 200:
+                                print("Success:", response.json())
+                                rec.entitiy_id = response.json()["id"]
+                                rec.send_response_json = response.json()
+                            else:
+                                print(f"Received status code {response.status_code}. Retrying...")
+                        except requests.exceptions.RequestException as e:
+                            print(f"Request failed: {e}. Retrying...")
+
+                        time.sleep(5)  # Wait for 5 seconds before retrying
+
     def action_receive_ocr(self):
         xuser = self.env.user.company_id
 
