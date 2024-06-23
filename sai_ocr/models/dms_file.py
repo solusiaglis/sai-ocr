@@ -52,7 +52,7 @@ class File(models.Model):
                     project_id = xuser.sai_invoice_project_id
 
                 if project_id:
-                    xfile_url = rec.get_base_url() + rec._get_share_url(redirect=False)
+                    xfile_url = rec.get_base_url() + rec._get_share_url(redirect=True)
                     time.sleep(1)
 
                     if xfile_url:
