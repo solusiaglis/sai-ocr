@@ -66,7 +66,7 @@ class File(models.Model):
                     project_id = xuser.sai_invoice_project_id
 
                 if project_id:
-                    xresponse = self.url_open(rec.get_base_url() + rec._get_share_url, timeout=30)
+                    xresponse = self.url_open(rec.get_base_url() + rec._get_share_url(), timeout=30)
                     if xresponse.status_code == 200:
                         # xfile_url = rec.get_base_url() + rec._get_share_url(redirect=True)
                         xfile_url = rec.get_base_url() + rec._get_share_url()
