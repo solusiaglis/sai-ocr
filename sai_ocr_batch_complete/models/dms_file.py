@@ -8,7 +8,7 @@ import time
 class File(models.Model):
     _inherit = "dms.file"
 
-    batch_processing = fields.Boolean()
+    batch_processing = fields.Boolean(default=True)
 
     def action_send_ocr(self):
         self.ensure_one()
