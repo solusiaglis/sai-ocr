@@ -4,9 +4,6 @@ from odoo import api, fields, models, _
 
 import time
 
-# from odoo.tests.common import HttpCase, tagged, ChromeBrowser
-# from odoo.tools import config, logging
-# from unittest.mock import patch
 
 class File(models.Model):
     _inherit = "dms.file"
@@ -17,15 +14,6 @@ class File(models.Model):
     receive_ocr = fields.Boolean("Receive OCR", compute="_compute_receive_ocr")
     receive_response_json = fields.Char("Receive Response JSON")
     ocr_share_url = fields.Char("OCR share url")
-
-    # def url_open(self, url, data=None, files=None, timeout=12, headers=None, allow_redirects=True, head=False):
-    #     if url.startswith('/'):
-    #         url = self.base_url() + url
-    #     if head:
-    #         return self.opener.head(url, data=data, files=files, timeout=timeout, headers=headers, allow_redirects=False)
-    #     if data or files:
-    #         return self.opener.post(url, data=data, files=files, timeout=timeout, headers=headers, allow_redirects=allow_redirects)
-    #     return self.common.opener.get(url, timeout=timeout, headers=headers, allow_redirects=allow_redirects)
 
     @api.depends("send_response_json")
     def _compute_send_ocr(self):
@@ -55,20 +43,6 @@ class File(models.Model):
 
         headers = {"X-API-KEY": api_key}
 
-        # for rec in self:
-        #     if not rec.send_response_json:
-
-        #         if rec.directory_id.ocr_model_type == "journal":
-        #             project_id = xuser.sai_journal_project_id
-        #         if rec.directory_id.ocr_model_type == "bill":
-        #             project_id = xuser.sai_bill_project_id
-        #         if rec.directory_id.ocr_model_type == "invoice":
-        #             project_id = xuser.sai_invoice_project_id
-
-        #         if project_id:
-        #             xfile_url = rec.get_base_url() + rec._get_share_url(redirect=True)
-        #             print(xfile_url)
-
         for rec in self:
             if not rec.send_response_json:
 
@@ -80,11 +54,7 @@ class File(models.Model):
                     project_id = xuser.sai_invoice_project_id
 
                 if project_id:
-                    # xresponse = self.url_open(rec.get_base_url() + rec._get_share_url(), timeout=30)
-                    # if xresponse.status_code == 200:
-                    # xfile_url = rec.get_base_url() + rec._get_share_url(redirect=True)
                     rec.ocr_share_url = rec.get_base_url() + rec._get_share_url()
-                    # xfile_url = "https://slicedinvoices.com/pdf/wordpress-pdf-invoice-plugin-sample.pdf"
 
                     xfile_url = rec.ocr_share_url
                     if xfile_url:
@@ -100,22 +70,14 @@ class File(models.Model):
 
                         url = f"{api_url}/workspaces/{workspace_id}/projects/{project_id}/entities"
 
-                        response = requests.post(url, json=payload, headers=headers, timeout=30)
-
                         try:
+                            response = requests.post(url, json=payload, headers=headers, timeout=30)
+                            response.raise_for_status()  # Raises an exception for HTTP errors
                             rec.entitiy_id = response.json()["id"]
                             rec.send_response_json = response.json()
-                        except Exception:
-                            pass
-
-                        # try:
-                        #     response = requests.post(url, json=payload, headers=headers, timeout=30)
-                        #     response.raise_for_status()  # Raises an exception for HTTP errors
-                        #     rec.entitiy_id = response.json()["id"]
-                        #     rec.send_response_json = response.json()
-                        #     print(response.json())  # Or handle the response data as needed
-                        # except requests.exceptions.RequestException as e:
-                        #     print(f"An error occurred: {e}")
+                            print(response.json())  # Or handle the response data as needed
+                        except requests.exceptions.RequestException as e:
+                            print(f"An error occurred: {e}")
                                                     
 
     def action_receive_ocr(self):
