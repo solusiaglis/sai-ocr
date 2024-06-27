@@ -29,7 +29,7 @@ class File(models.Model):
             if rec.send_response_json and not rec.receive_response_json:
                 rec.receive_ocr = True
 
-    def action_send_ocr(self):
+    def process_send_ocr(self):
         xuser = self.env.user.company_id
 
         workspace_id = xuser.sai_workspace_id
@@ -42,7 +42,6 @@ class File(models.Model):
         # url = f"{api_url}/workspaces/{workspace_id}/projects/{project_id}/entities"
 
         headers = {"X-API-KEY": api_key}
-
         for rec in self:
             if not rec.send_response_json:
 
@@ -78,6 +77,10 @@ class File(models.Model):
                             print(response.json())  # Or handle the response data as needed
                         except requests.exceptions.RequestException as e:
                             print(f"An error occurred: {e}")
+
+    def action_send_ocr(self):
+        for rec in self:
+            rec.process_send_ocr()
                                                     
 
     def action_receive_ocr(self):
