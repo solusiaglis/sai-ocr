@@ -11,7 +11,6 @@ class File(models.Model):
     batch_processing = fields.Boolean(default=True)
 
     def action_send_ocr(self):
-        self.ensure_one()
         for rec in self:
             if not rec.batch_processing:
                 return super().action_send_ocr()
