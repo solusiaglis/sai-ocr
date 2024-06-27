@@ -8,7 +8,7 @@ import time
 class File(models.Model):
     _inherit = "dms.file"
 
-    def process_send_ocr(self):
+    def action_send_ocr(self):
         # if not self.env.context.get("test_queue_job_no_delay", False):
         results = []
         log_error = ""
@@ -19,6 +19,6 @@ class File(models.Model):
                 rec_id=record.id,
                 file_name=record.name,
             )
-            record.with_delay(description=description).process_send_ocr()
+            record.with_delay(description=description).action_send_ocr()
         return results, log_error
 
