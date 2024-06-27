@@ -8,13 +8,9 @@ import time
 class File(models.Model):
     _inherit = "dms.file"
 
-    batch_processing = fields.Boolean(default=True)
-
     def action_send_ocr(self):
         for rec in self:
-            if not rec.batch_processing:
-                return super().action_send_ocr()
-            if not self.env.context.get("job_uuid") and not self.env.context.get(
+            if not rec.env.context.get("job_uuid") and not rec.env.context.get(
                 "test_queue_job_no_delay"
             ):
                 description = _(
@@ -26,8 +22,6 @@ class File(models.Model):
                 job = rec.with_delay(description=description).action_send_ocr()
                 return "Send OCR with uuid {}".format(job.uuid)
             else:
-                return super(
-                    File, rec.with_context(asset_batch_processing=True)
-                ).action_send_ocr()
+                return super(File).action_send_ocr()
 
 
