@@ -24,7 +24,7 @@ class File(models.Model):
                 # return "Send OCR with uuid {}".format(job_send.uuid)
 
                 job1 = rec.delayable().process_send_ocr()
-                job2 = rec.delayable().process_receive_ocr()
+                job2 = rec.delayable(eta=30).process_receive_ocr()
 
                 job1.on_done(job2) \
                 .set(priority=30) \
