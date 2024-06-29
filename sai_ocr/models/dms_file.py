@@ -72,10 +72,9 @@ class File(models.Model):
                         try:
                             response = requests.post(url, json=payload, headers=headers, timeout=30)
                             response.raise_for_status()  # Raises an exception for HTTP errors
-                            if response.status == 200:
-                                rec.entitiy_id = response.json()["id"]
-                                rec.send_response_json = response.json()
-                                print(response.json())  # Or handle the response data as needed
+                            rec.entitiy_id = response.json()["id"]
+                            rec.send_response_json = response.json()
+                            print(response.json())  # Or handle the response data as needed
 
                         except requests.exceptions.RequestException as e:
                             print(f"An error occurred: {e}")
