@@ -31,7 +31,7 @@ class File(models.Model):
                 .set(description=_(description)) \
                 .delay()
 
-                return "Send and Receive OCR with uuid {}".format(job1.uuid)
+                return "Send and Receive OCR with uuid {}".format(job1.id)
 
             else:
                 return super().process_send_ocr()
