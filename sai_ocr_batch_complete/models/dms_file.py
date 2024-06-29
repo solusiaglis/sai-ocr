@@ -8,7 +8,7 @@ import time
 class File(models.Model):
     _inherit = "dms.file"
 
-    def action_send_ocr(self):
+    def process_send_ocr(self):
         for rec in self:
             if not rec.env.context.get("job_uuid") and not rec.env.context.get(
                 "test_queue_job_no_delay"
@@ -19,9 +19,10 @@ class File(models.Model):
                     rec_id=rec.id,
                     file_name=rec.name,
                 )
-                job = rec.with_delay(description=description).action_send_ocr()
+                job = rec.with_delay(description=description).process_send_ocr()
                 return "Send OCR with uuid {}".format(job.uuid)
             else:
-                return super(File).action_send_ocr()
+                return super().process_send_ocr()
+            
 
 
