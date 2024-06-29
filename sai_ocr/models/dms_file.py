@@ -72,19 +72,19 @@ class File(models.Model):
                         try:
                             response = requests.post(url, json=payload, headers=headers, timeout=30)
                             response.raise_for_status()  # Raises an exception for HTTP errors
-                            rec.entitiy_id = response.json()["id"]
-                            rec.send_response_json = response.json()
-                            print(response.json())  # Or handle the response data as needed
+                            if response.status == 200:
+                                rec.entitiy_id = response.json()["id"]
+                                rec.send_response_json = response.json()
+                                print(response.json())  # Or handle the response data as needed
+
                         except requests.exceptions.RequestException as e:
                             print(f"An error occurred: {e}")
 
     def action_send_ocr(self):
         for rec in self:
             rec.process_send_ocr()
-            time.sleep(3)
-                    
 
-    def action_receive_ocr(self):
+    def process_receive_ocr(self):
         xuser = self.env.user.company_id
 
         workspace_id = xuser.sai_workspace_id
@@ -116,8 +116,13 @@ class File(models.Model):
                     if response.json()["status"] == "complete":
                         rec.receive_response_json = response.json()
                         print(response.json())  # Or handle the response data as needed
+                       
                 except requests.exceptions.RequestException as e:
                     print(f"An error occurred: {e}")
+
+    def action_receive_ocr(self):
+        for rec in self:
+            rec.process_receive_ocr()
 
     def action_create_journal(self):
         return
