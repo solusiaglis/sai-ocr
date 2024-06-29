@@ -81,7 +81,8 @@ class File(models.Model):
     def action_send_ocr(self):
         for rec in self:
             rec.process_send_ocr()
-                                                    
+            time.sleep(3)
+                    
 
     def action_receive_ocr(self):
         xuser = self.env.user.company_id
@@ -110,7 +111,7 @@ class File(models.Model):
                 }
 
                 try:
-                    response = requests.put(url, json=payload, headers=headers, timeout=300)
+                    response = requests.put(url, json=payload, headers=headers, timeout=30)
                     response.raise_for_status()  # Raises an exception for HTTP errors
                     if response.json()["status"] == "complete":
                         rec.receive_response_json = response.json()
