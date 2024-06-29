@@ -20,17 +20,19 @@ class File(models.Model):
                     file_name=rec.name,
                 )
 
-                job_send = rec.with_delay(description=description).process_send_ocr()
+                # job_send = rec.with_delay(description=description).process_send_ocr()
+                # return "Send OCR with uuid {}".format(job_send.uuid)
 
-                # job1 = rec.delayable().process_send_ocr()
-                # job2 = rec.delayable().process_receive_ocr()
+                job1 = rec.delayable().process_send_ocr()
+                job2 = rec.delayable().process_receive_ocr()
 
-                # job1.on_done(job2) \
-                # .set(priority=30) \
-                # .set(description=_(description)) \
-                # .delay()
-                
-                return "Send OCR with uuid {}".format(job_send.uuid)
+                job1.on_done(job2) \
+                .set(priority=30) \
+                .set(description=_(description)) \
+                .delay()
+
+                return "Send and Receive OCR with uuid {}".format(job1.uuid)
+
             else:
                 return super().process_send_ocr()
             
