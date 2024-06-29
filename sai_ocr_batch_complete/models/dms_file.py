@@ -49,7 +49,7 @@ class File(models.Model):
 
                 job_received = rec.with_delay(description=description).process_receive_ocr()
 
-                return "Send OCR with uuid {}".format(job_received.uuid)
+                return "Receive OCR with uuid {}".format(job_received.uuid)
             else:
                 return super().process_receive_ocr()
 
