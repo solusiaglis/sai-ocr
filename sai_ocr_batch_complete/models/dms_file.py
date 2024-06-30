@@ -23,8 +23,8 @@ class File(models.Model):
                 # job_send = rec.with_delay(description=description).process_send_ocr()
                 # return "Send OCR with uuid {}".format(job_send.uuid)
 
-                job1 = rec.delayable().process_send_ocr()
-                job2 = rec.delayable(eta=30).process_receive_ocr()
+                job1 = rec.delayable(channel='channel_sai_ocr_batch_action_send_ocr').process_send_ocr()
+                job2 = rec.delayable(channel='channel_sai_ocr_batch_action_send_ocr',eta=30).process_receive_ocr()
 
                 job1.on_done(job2) \
                 .set(priority=30) \
