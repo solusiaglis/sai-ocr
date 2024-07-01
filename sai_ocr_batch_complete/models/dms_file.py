@@ -25,8 +25,9 @@ class File(models.Model):
 
                 job1 = rec.delayable(channel='channel_sai_ocr_batch_action_send_ocr').process_send_ocr()
                 job2 = rec.delayable(channel='channel_sai_ocr_batch_action_send_ocr',eta=30).process_receive_ocr()
+                job3 = rec.delayable(channel='channel_sai_ocr_batch_action_send_ocr',eta=60).process_delete_ocr()
 
-                job1.on_done(job2) \
+                job1.on_done(job2.on_done(job3)) \
                 .set(priority=30) \
                 .set(description=_(description)) \
                 .delay()

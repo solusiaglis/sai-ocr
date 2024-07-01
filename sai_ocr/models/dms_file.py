@@ -14,6 +14,7 @@ class File(models.Model):
     receive_ocr = fields.Boolean("Receive OCR", compute="_compute_receive_ocr")
     receive_response_json = fields.Char("Receive Response JSON")
     ocr_share_url = fields.Char("OCR share url")
+    ocr_delete = fields.Boolean("OCR delete")
 
     @api.depends("send_response_json")
     def _compute_send_ocr(self):
@@ -131,3 +132,33 @@ class File(models.Model):
 
     def action_create_invoice(self):
         return
+
+    def process_delete_ocr(self):
+        xuser = self.env.user.company_id
+
+        workspace_id = xuser.sai_workspace_id
+        project_id = xuser.sai_invoice_project_id
+
+        # api_url = xuser.sai_api_url
+        api_url = "https://go.v7labs.com/api"
+        api_key = xuser.sai_api_key
+
+        for rec in self:
+            if rec.receive_response_json and not rec.ocr_delete:
+                entitiy_id = rec.entitiy_id
+
+                url = f"{api_url}/workspaces/{workspace_id}/projects/{project_id}/entities/{entitiy_id}"
+
+                headers = {
+                    "accept": "application/json",
+                    "X-API-KEY": api_key
+                }
+
+                try:
+                    response = requests.delete(url, headers=headers)
+                    print(response)
+                    rec.ocr_delete = True
+                       
+                except requests.exceptions.RequestException as e:
+                    print(f"An error occurred: {e}")
+
