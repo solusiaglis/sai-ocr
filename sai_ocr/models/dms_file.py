@@ -4,6 +4,7 @@ from odoo import api, fields, models, _
 
 import time
 
+
 class File(models.Model):
     _inherit = "dms.file"
 
@@ -12,6 +13,8 @@ class File(models.Model):
     send_ocr = fields.Boolean("Send OCR", compute="_compute_send_ocr")
     receive_ocr = fields.Boolean("Receive OCR", compute="_compute_receive_ocr")
     receive_response_json = fields.Char("Receive Response JSON")
+    ocr_share_url = fields.Char("OCR share url")
+    ocr_delete = fields.Boolean("OCR delete")
 
     @api.depends("send_response_json")
     def _compute_send_ocr(self):
@@ -27,7 +30,7 @@ class File(models.Model):
             if rec.send_response_json and not rec.receive_response_json:
                 rec.receive_ocr = True
 
-    def action_send_ocr(self):
+    def process_send_ocr(self):
         xuser = self.env.user.company_id
 
         workspace_id = xuser.sai_workspace_id
@@ -40,7 +43,6 @@ class File(models.Model):
         # url = f"{api_url}/workspaces/{workspace_id}/projects/{project_id}/entities"
 
         headers = {"X-API-KEY": api_key}
-
         for rec in self:
             if not rec.send_response_json:
 
@@ -52,14 +54,14 @@ class File(models.Model):
                     project_id = xuser.sai_invoice_project_id
 
                 if project_id:
-                    xfile_url = rec.get_base_url() + rec._get_share_url(redirect=True)
-                    # time.sleep(1)
+                    rec.ocr_share_url = rec.get_base_url() + rec._get_share_url()
 
+                    xfile_url = rec.ocr_share_url
                     if xfile_url:
 
                         payload = {
                             "fields": {
-                                "invoice": {
+                                "invoice": { 
                                     "file_name": rec.name,
                                     "file_url": xfile_url,
                                 }
@@ -68,39 +70,21 @@ class File(models.Model):
 
                         url = f"{api_url}/workspaces/{workspace_id}/projects/{project_id}/entities"
 
-                        #response = requests.post(url, json=payload, headers=headers, timeout=30)
+                        try:
+                            response = requests.post(url, json=payload, headers=headers, timeout=30)
+                            response.raise_for_status()  # Raises an exception for HTTP errors
+                            rec.entitiy_id = response.json()["id"]
+                            rec.send_response_json = response.json()
+                            print(response.json())  # Or handle the response data as needed
 
-                        # try:
-                        #     rec.entitiy_id = response.json()["id"]
-                        #     rec.send_response_json = response.json()
-                        # except Exception:
-                        #     pass
+                        except requests.exceptions.RequestException as e:
+                            print(f"An error occurred: {e}")
 
-                        # try:
-                        #     response = requests.post(url, json=payload, headers=headers, timeout=30)
-                        #     response.raise_for_status()  # Raises an exception for HTTP errors
-                        #     rec.entitiy_id = response.json()["id"]
-                        #     rec.send_response_json = response.json()
-                        #     print(response.json())  # Or handle the response data as needed
-                        # except requests.exceptions.RequestException as e:
-                        #     print(f"An error occurred: {e}")
-                                                    
-                        while True:
-                            try:
-                                response = requests.post(url, json=payload, headers=headers, timeout=120)
-                                time.sleep(5)  # Wait for 5 seconds before retrying
-                                if response.status_code == 200:
-                                    print("Success:", response.json())
-                                    rec.entitiy_id = response.json()["id"]
-                                    rec.send_response_json = response.json()
-                                    break
-                                else:
-                                    print(f"Received status code {response.status_code}. Retrying...")
-                            except requests.exceptions.RequestException as e:
-                                print(f"Request failed: {e}. Retrying...")
-                            time.sleep(5)  # Wait for 5 seconds before retrying
-                            
-    def action_receive_ocr(self):
+    def action_send_ocr(self):
+        for rec in self:
+            rec.process_send_ocr()
+
+    def process_receive_ocr(self):
         xuser = self.env.user.company_id
 
         workspace_id = xuser.sai_workspace_id
@@ -127,13 +111,18 @@ class File(models.Model):
                 }
 
                 try:
-                    response = requests.put(url, json=payload, headers=headers, timeout=120)
+                    response = requests.put(url, json=payload, headers=headers, timeout=30)
                     response.raise_for_status()  # Raises an exception for HTTP errors
                     if response.json()["status"] == "complete":
                         rec.receive_response_json = response.json()
                         print(response.json())  # Or handle the response data as needed
+                       
                 except requests.exceptions.RequestException as e:
                     print(f"An error occurred: {e}")
+
+    def action_receive_ocr(self):
+        for rec in self:
+            rec.process_receive_ocr()
 
     def action_create_journal(self):
         return
@@ -143,3 +132,33 @@ class File(models.Model):
 
     def action_create_invoice(self):
         return
+
+    def process_delete_ocr(self):
+        xuser = self.env.user.company_id
+
+        workspace_id = xuser.sai_workspace_id
+        project_id = xuser.sai_invoice_project_id
+
+        # api_url = xuser.sai_api_url
+        api_url = "https://go.v7labs.com/api"
+        api_key = xuser.sai_api_key
+
+        for rec in self:
+            if rec.receive_response_json and not rec.ocr_delete:
+                entitiy_id = rec.entitiy_id
+
+                url = f"{api_url}/workspaces/{workspace_id}/projects/{project_id}/entities/{entitiy_id}"
+
+                headers = {
+                    "accept": "application/json",
+                    "X-API-KEY": api_key
+                }
+
+                try:
+                    response = requests.delete(url, headers=headers)
+                    print(response)
+                    rec.ocr_delete = True
+                       
+                except requests.exceptions.RequestException as e:
+                    print(f"An error occurred: {e}")
+

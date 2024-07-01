@@ -28,13 +28,13 @@
                     string="Send OCR"
                     attrs="{'invisible':[('send_ocr', '=', False)]}"
                 />
-                <button
+                <!-- <button
                     class="oe_highlight"
                     name="action_receive_ocr"
                     type="object"
                     string="Receive OCR"
                     attrs="{'invisible':[('receive_ocr', '=', False)]}"
-                />
+                /> -->
             </xpath>
         </field>
     </record>
@@ -52,7 +52,7 @@
                         type="object"
                         string="Send OCR"
                     />
-                    <button
+                    <!-- <button
                         class="oe_highlight"
                         name="action_receive_ocr"
                         type="object"
@@ -75,7 +75,7 @@
                         name="action_create_invoice"
                         type="object"
                         string="Invoice OCR"
-                    />
+                    /> -->
                 </header>
             </xpath>
         </field>
